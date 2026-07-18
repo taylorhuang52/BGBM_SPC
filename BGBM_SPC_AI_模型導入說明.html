@@ -198,6 +198,22 @@
   .stage-body li strong{color:var(--text-primary);}
 
   /* checklist */
+  .steps{display:flex;flex-direction:column;gap:14px;max-width:820px;margin:18px 0;}
+  .step{display:flex;gap:14px;align-items:flex-start;}
+  .step .sn{
+    width:26px;height:26px;border-radius:50%;background:var(--bg-raised);border:1px solid var(--teal);
+    color:var(--teal);font-family:var(--font-mono);font-size:12px;font-weight:600;
+    display:flex;align-items:center;justify-content:center;flex:none;margin-top:1px;
+  }
+  .step .st{font-size:13.5px;color:var(--text-muted);line-height:1.75;padding-top:2px;}
+  .step .st strong{color:var(--text-primary);}
+  .subhead{font-size:14px;color:var(--text-primary);font-family:var(--font-mono);letter-spacing:.3px;margin-top:34px;}
+  .new-badge{
+    display:inline-block;font-family:var(--font-mono);font-size:9.5px;letter-spacing:.5px;
+    color:var(--bg-void);background:var(--teal);padding:2px 7px;border-radius:4px;margin-left:8px;
+    vertical-align:middle;text-transform:uppercase;
+  }
+
   .checklist{display:flex;flex-direction:column;gap:12px;max-width:820px;margin-top:20px;}
   .chk{display:flex;gap:14px;align-items:flex-start;background:var(--bg-panel);border:1px solid var(--line);border-radius:9px;padding:14px 18px;}
   .chk .box{width:18px;height:18px;border:1.5px solid var(--text-dim);border-radius:4px;flex:none;margin-top:2px;}
@@ -441,7 +457,7 @@
 
       <div class="callout">
         <div class="ic">已交付</div>
-        <p><strong>BGBM_SPC_Dashboard.html</strong> 已依本報告發現 1（Ti 腔體電壓飄移案例）為藍本建置完成，可直接開啟使用，作為階段一的實際落地成果，非僅規劃文件。</p>
+        <p><strong>BGBM_SPC_Dashboard.html</strong> 已依本報告發現 1（Ti 腔體電壓飄移案例）為藍本建置完成，可直接開啟使用，作為階段一的實際落地成果，非僅規劃文件。<strong>後續更新</strong>已加入「重新基準事件標記」功能（見下方 3.1），用來因應本報告發現 1 這類人為介入／硬體狀態改變造成的永久性製程水準改變。</p>
       </div>
 
       <p>儀表板設計要點：</p>
@@ -449,7 +465,33 @@
         <li>直接取用設備已算好的 <strong>Ave / Max / Min</strong> 統計列，不需複雜運算。</li>
         <li>針對關鍵變數（濺鍍電壓/電流/功率、腔體壓力、真空/破真空時間、加熱溫度）建立管制圖（<strong>Xbar 或 I-MR chart</strong>），依 recipe / 腔體分開設定管制界線。</li>
         <li>觸發規則：超出 <strong>3σ</strong>、連續多點單側偏移（如發現 1 的情境）、或連續上升/下降趨勢，即時告警給工程師。</li>
+        <li>支援「重新基準事件標記」，讓管制界線能反映製程真正的當前狀態，而非永遠停在最初的基準。</li>
       </ul>
+
+      <h3 class="subhead">3.1 重新基準（Re-baseline）事件標記<span class="new-badge">New</span></h3>
+      <p>管制界線預設是用資料最前面 N 點（基準線點數）算出來、之後就固定不動。但如果製程發生<strong>已確認的人為介入或硬體狀態改變</strong>（例如發現 1 描述的靶材保養/更換事件），製程會永久落在新的水準——這時候舊的管制界線會讓新水準的資料被<strong>持續誤判為超限</strong>，造成工程師假警報疲勞，也會蓋掉未來真正的異常訊號。因此在 Dashboard 上加入了讓工程師手動標記事件、將管制圖切成前後兩個階段（Phase）分別計算基準的功能。</p>
+
+      <div class="callout violet">
+        <div class="ic">原則</div>
+        <p>不能只因為看到飄移就重設界線——一定要先比對 PM 工單／靶材更換紀錄，<strong>確認這是已知、被允許的製程狀態改變</strong>，再進行標記；查無對應紀錄時，應該當作異常繼續追蹤，而不是急著把它標記掉。</p>
+      </div>
+
+      <p style="font-family:var(--font-mono);font-size:11px;color:var(--text-dim);letter-spacing:.5px;text-transform:uppercase;margin:26px 0 4px;">使用方式</p>
+      <div class="steps">
+        <div class="step"><div class="sn">1</div><div class="st">在圖表控制列點擊 <strong>「＋ 標記重新基準事件」</strong>按鈕，按鈕會變成高亮的標記模式，滑鼠移到圖上會變成十字準心。</div></div>
+        <div class="step"><div class="sn">2</div><div class="st">直接在圖上<strong>點擊發生轉變的那個資料點</strong>（例如飄移剛開始的那一片），系統會抓最接近的資料點時間，作為新基準的起點。</div></div>
+        <div class="step"><div class="sn">3</div><div class="st">圖表立即切成兩個 <strong>Phase</strong>：舊 Phase 的 UCL／x̄／LCL 線會淡化保留在圖上作歷史對照，不會被刪除；新 Phase 從標記點開始，用自己的資料重新計算管制界線，左側座標軸文字與下方統計列（基準均值、UCL/LCL、超限點數…）同步改用新 Phase 的數字。</div></div>
+        <div class="step"><div class="sn">4</div><div class="st">圖表下方會出現可移除的標記 chip（時間 + ✕）與 Phase 摘要表，列出每個階段的日期範圍、x̄、σ、UCL/LCL、點數，方便前後對比；點 chip 上的 ✕ 即可移除標記、還原回單一基準。</div></div>
+      </div>
+
+      <div class="callout amber">
+        <div class="ic">適用範圍</div>
+        <p>標記以<strong>腔體</strong>為單位——同一腔體的電壓／電流／功率等所有參數共用同一組事件時間點，因為換靶、PM 這類硬體事件通常會同時影響該腔體的多個製程參數，標記一次即可讓該腔體所有相關圖表一起重新分期。</p>
+      </div>
+      <div class="callout">
+        <div class="ic">目前限制</div>
+        <p>標記目前僅保存在瀏覽器記憶體中，重新整理頁面會清空——因為這是純前端靜態頁面，尚未串接後端資料庫。如需長期保存重新基準的歷史紀錄（跨工程師、跨裝置共用），需要另外接資料庫或至少支援 JSON 匯出／匯入，屬於後續可擴充項目。</p>
+      </div>
     </section>
 
     <section id="ai">
