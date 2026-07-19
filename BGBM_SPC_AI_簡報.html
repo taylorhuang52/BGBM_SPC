@@ -185,6 +185,20 @@
   .analogy-box .tx{font-size:14px;color:var(--text-muted);line-height:1.7;}
   .analogy-box .tx b{color:var(--amber);}
 
+  /* ---------- comparison table ---------- */
+  .cmp-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;}
+  .cmp-table th, .cmp-table td{padding:12px 16px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line-soft);}
+  .cmp-table thead th{
+    font-family:var(--font-mono);font-size:11px;letter-spacing:.5px;text-transform:uppercase;
+    color:var(--text-dim);background:var(--bg-panel);border-bottom:1px solid var(--line);
+  }
+  .cmp-table thead th.hl-ai{color:var(--cyan);}
+  .cmp-table tbody th{font-weight:600;font-size:13px;color:var(--text-primary);background:var(--bg-inset);white-space:nowrap;}
+  .cmp-table tbody td{color:var(--text-muted);line-height:1.6;}
+  .cmp-table tbody td.ai-cell{color:var(--text-primary);}
+  .cmp-table tbody tr:last-child td, .cmp-table tbody tr:last-child th{border-bottom:none;}
+  .cmp-wrap{border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+
   /* ---------- closing ---------- */
   .closing .big{font-family:var(--font-mono);font-size:clamp(40px,6vw,80px);color:var(--cyan);font-weight:700;line-height:1;}
   .contact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px;}
@@ -616,7 +630,61 @@ addSlide('階段二', `
 </div>
 `);
 
-/* ---------------- 15. Phase 3 detail ---------------- */
+/* ---------------- 14b. 機台內建提醒 vs AI模型 ---------------- */
+addSlide('內建提醒vsAI', `
+<div class="slide-inner">
+  <div class="kicker"><span class="num">?</span>常見問題</div>
+  <h1 class="title">機台本來就有換靶提醒，跟 <span class="accent">AI模型</span> 差在哪？</h1>
+  <div class="body-area">
+    <div class="cmp-wrap">
+      <table class="cmp-table">
+        <thead>
+          <tr>
+            <th style="width:16%;">比較項目</th>
+            <th style="width:40%;">機台內建提醒</th>
+            <th class="hl-ai" style="width:44%;">AI / 資料驅動模型（規劃中的階段②）</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th>判斷邏輯</th>
+            <td>固定門檻：累積用量(如kWh)達到設定值就跳警報，所有情況一視同仁</td>
+            <td class="ai-cell">動態趨勢：看「用量累積的速率」，反推還能撐幾批、大概哪一天會到門檻</td>
+          </tr>
+          <tr>
+            <th>提醒時機</th>
+            <td>事到臨頭才響 — 通常是到達門檻的當下才觸發，可能剛好卡在批次中間</td>
+            <td class="ai-cell">提前預告：「還剩約N批會到門檻」，可排在計畫性停機/換批空檔去換，不打斷生產</td>
+          </tr>
+          <tr>
+            <th>是否考慮<br>使用差異</th>
+            <td>不會。不管這批鍍得快或慢、Recipe是Ti(8kW)還是Ni/Ag(4kW)，門檻都一樣</td>
+            <td class="ai-cell">會。可依腔體/Recipe分別建模 — 我們資料顯示Ti腔耗用速率明顯跟Ni/Ag不同</td>
+          </tr>
+          <tr>
+            <th>能否抓<br>「異常耗損」</th>
+            <td>不行。就算靶材因某個異常原因耗損突然變快，也要等累積值到門檻才會示警</td>
+            <td class="ai-cell">可以。耗用速率突然變陡，本身就是異常訊號，能比「到門檻」更早示警</td>
+          </tr>
+          <tr>
+            <th>能否關聯<br>製程品質</th>
+            <td>不行，是獨立的計數器，跟其他製程參數無關</td>
+            <td class="ai-cell">可以。例如Ti腔電壓在6/3飄移，時間點剛好接近該腔累積功率的重置 — AI模型能把這類關聯一起納入判斷</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="analogy-box">
+      <div class="ic">💡</div>
+      <div class="tx">一句話講重點：機台內建提醒像汽車的<b>「油量燈」</b>——油到一定程度就亮燈，不管你平常開高速還是市區。AI模型像<b>「導航預估還能開多遠」</b>——會看實際耗油習慣，提前告訴你「大概還能開80公里，建議在下個休息站加油」，而不是等燈亮了才臨時找加油站。</div>
+    </div>
+    <div class="insight-box" style="margin-top:14px;">
+      <div class="k">待釐清事項</div>
+      <p>機台內建提醒的實際邏輯(門檻值多少、是否也有簡單趨勢判斷)目前是從資料反推，還沒跟設備工程師確認真正規格 — 這正是階段②「先釐清累積耗用功率計數器定義」要做的事，確認後才能準確評估AI模型能帶來多少額外的提前預警時間。</p>
+    </div>
+  </div>
+</div>
+`);
 addSlide('階段三', `
 <div class="slide-inner">
   <div class="phase-head">
